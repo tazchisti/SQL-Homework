@@ -146,7 +146,55 @@ where category.name = "Family";
 
 select*from inventory;
 
-select film.title from film
-inner join
+select film.film_id, film.title, count(rental.rental_id) rentals from film 
+inner join inventory on film.film_id = inventory.film_id
+inner join rental on inventory.inventory_id = rental.inventory_id
+group by film.film_id
+order by rentals desc limit 25 ;
+
+select film.title count(rental.inventory_id) from film
+inner join inventory on film.film_id = inventory;
+
+-- 7f. Write a query to display how much business, in dollars, each store brought in.
+
+select staff.store_id, sum(payment.amount) from payment 
+join staff on payment.staff_id = staff.staff_id
+group by staff.staff_id;
+
+-- 7g. Write a query to display for each store its store ID, city, and country.
 
 
+select store.store_id, city.city, country.country from store
+left join address on store.address_id = address.address_id
+left join city on address.city_id = city.city_id
+left join country on city.country_id = country.country_id;
+
+
+-- 7h. List the top five genres in gross revenue in descending order. (**Hint**: you may need to use the following tables: category, film_category, inventory, payment, and rental.)
+
+select*from category;
+
+select c.name, sum(p.amount) gross  from category c 
+inner join film_category fc on c.category_id = fc.category_id
+inner join inventory i on fc.film_id = i.film_id
+inner join rental r on i.inventory_id = r.inventory_id
+inner join payment p on r.rental_id = p.rental_id
+group by c.name
+order by gross desc limit 5;
+
+
+-- 8a. In your new role as an executive, you would like to have an easy way of viewing the Top five genres by gross revenue. Use the solution from the problem above to create a view. If you haven't solved 7h, you can substitute another query to create a view.
+
+create view Top_5 as select c.name, sum(p.amount) gross  from category c 
+inner join film_category fc on c.category_id = fc.category_id
+inner join inventory i on fc.film_id = i.film_id
+inner join rental r on i.inventory_id = r.inventory_id
+inner join payment p on r.rental_id = p.rental_id
+group by c.name
+order by gross desc limit 5;
+
+
+select*from Top_5;
+
+
+drop view Top_5;
